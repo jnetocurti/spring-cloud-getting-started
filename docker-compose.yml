@@ -30,4 +30,16 @@ services:
       discovery-server
     command: ["./wait-for.sh", "-t", "500", "config-server:8082", "--", "./mvnw", "-s", "maven-settings.xml", "spring-boot:run"]
     depends_on:
-          - "config-server"
+      - "config-server"
+
+  gateway-server:
+    build: ./server/gateway-server
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./server/gateway-server:/usr/src/app
+    container_name:
+      gateway-server
+    command: ["./wait-for.sh", "-t", "500", "config-server:8082", "--", "./mvnw", "-s", "maven-settings.xml", "spring-boot:run"]
+    depends_on:
+      - "config-server"
