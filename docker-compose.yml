@@ -16,7 +16,7 @@ services:
       - ./server/config-server:/usr/src/app
     container_name:
       config-server
-    command: ["./wait-for.sh", "-t", "500", "nexus:8081", "--", "./mvnw", "-s", "maven-settings.xml", "spring-boot:run"]
+    command: ["./wait-for.sh", "-t", "1000", "nexus:8081", "--", "./mvnw", "-s", "maven-settings.xml", "spring-boot:run"]
     depends_on:
       - "nexus"
 
@@ -28,7 +28,7 @@ services:
       - ./server/discovery-server:/usr/src/app
     container_name:
       discovery-server
-    command: ["./wait-for.sh", "-t", "500", "config-server:8082", "--", "./mvnw", "-s", "maven-settings.xml", "spring-boot:run"]
+    command: ["./wait-for.sh", "-t", "1000", "config-server:8082", "--", "./mvnw", "-s", "maven-settings.xml", "spring-boot:run"]
     depends_on:
       - "config-server"
 
@@ -40,6 +40,18 @@ services:
       - ./server/gateway-server:/usr/src/app
     container_name:
       gateway-server
-    command: ["./wait-for.sh", "-t", "500", "config-server:8082", "--", "./mvnw", "-s", "maven-settings.xml", "spring-boot:run"]
+    command: ["./wait-for.sh", "-t", "1000", "discovery-server:8083", "--", "./mvnw", "-s", "maven-settings.xml", "spring-boot:run"]
     depends_on:
-      - "config-server"
+      - "discovery-server"
+
+  produto-service:
+    build: ./server/produto-service
+    ports:
+      - "8088:8088"
+    volumes:
+      - ./server/produto-service:/usr/src/app
+    container_name:
+      produto-service
+    command: ["./wait-for.sh", "-t", "1000", "gateway-server:8080", "--", "./mvnw", "-s", "maven-settings.xml", "spring-boot:run"]
+    depends_on:
+      - "gateway-server"
